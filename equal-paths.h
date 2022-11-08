@@ -26,4 +26,8 @@ struct Node {
  */
 bool equalPaths(Node * root);
 
+//helper
+bool PathFinder(Node* root, int& maxLength, int currLength);
+
+
 #endif
