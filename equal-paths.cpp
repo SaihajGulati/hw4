@@ -5,10 +5,10 @@ using namespace std;
 
 bool PathFinder(Node* root, int& maxLength, int currLength)
 {
-    //base case, if get past leaf node, then is true by default as both leaves do not exist and is thus  trivially equalpaths for this node onward
+    //base case, if get past leaf node, then is true by default as both leaves do not exist and is thus trivially equalpaths for this node onward
     if (root == nullptr)
     {
-        //if max length has not been set yet, then set to what ended up with heree
+        //if length of paths to compare to has not been set yet, then set to what ended up with here
         if (maxLength == -1)
         {
             maxLength = currLength;
@@ -24,7 +24,19 @@ bool PathFinder(Node* root, int& maxLength, int currLength)
         return true;
     }
 
-    //if not base case, then try left and right path
+		//handles case where tree path becomes one sided towards right
+		else if (root->left == nullptr && root->right != nullptr)
+		{
+			return PathFinder(root->right, maxLength, currLength + 1);
+		}
+
+		//handles case where tree path becomes one sided towards left
+		else if (root->right == nullptr && root->left != nullptr)
+		{
+			return PathFinder(root->left, maxLength, currLength + 1);
+		}
+
+    //if not any of those, then you are good to check both sides
     return PathFinder(root->left, maxLength, currLength + 1) && PathFinder(root->right, maxLength, currLength + 1);
 }
 
