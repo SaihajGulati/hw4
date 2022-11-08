@@ -249,7 +249,7 @@ protected:
 
     // Add helper functions here
     void helpClear(Node<Key, Value>* montez);
-    int calculateHeightIfBalanced(Node<Key, Value>* root);
+    int calculateHeightIfBalanced(Node<Key, Value>* root) const;
 
 protected:
     Node<Key, Value>* root_;
@@ -462,7 +462,8 @@ void BinarySearchTree<Key, Value>::insert(const std::pair<const Key, Value> &key
     //if root is null, need to add one to start because there is nothing in this tree
     if (root_ == nullptr)
     {
-        root_ = new Node<Key, Value>(keyValuePair.first, keyValuePair.second, nullptr);
+        Node<Key, Value>* temp = new Node<Key, Value>(keyValuePair.first, keyValuePair.second, nullptr);
+        root_ = temp;
     }
 
     else
@@ -480,7 +481,8 @@ void BinarySearchTree<Key, Value>::insert(const std::pair<const Key, Value> &key
                 //check if the left of my temp is null, bc then we'll put into my temp's left
                 if (temp->getLeft() == nullptr)
                 {
-                    temp->setLeft(new Node<Key, Value>(keyValuePair.first, keyValuePair.second, temp));
+                    Node<Key, Value>* baby = new Node<Key, Value>(keyValuePair.first, keyValuePair.second, temp);
+                    temp->setLeft(baby);
                     inserted = true;
                 }
 
@@ -495,7 +497,8 @@ void BinarySearchTree<Key, Value>::insert(const std::pair<const Key, Value> &key
                 //check if the Right of my temp is null/empty, bc then we'll put into my temp's Right
                 if (temp->getRight() == nullptr)
                 {
-                    temp->setRight(new Node<Key, Value>(keyValuePair.first, keyValuePair.second, temp));
+                    Node<Key, Value>* baby = new Node<Key, Value>(keyValuePair.first, keyValuePair.second, temp);
+                    temp->setRight(baby);
                     inserted = true;
                 }
 
@@ -535,7 +538,7 @@ void BinarySearchTree<Key, Value>::remove(const Key& key)
     }
 
     //attempt to find the key in the tree
-    Node<Key, Value>* curr = internalFind(key);
+    Node<Key, Value>* curr = this->internalFind(key);
 
     //check to see if key not found in tree, so then can just return
     if (curr == nullptr)
@@ -557,18 +560,25 @@ void BinarySearchTree<Key, Value>::remove(const Key& key)
         Node<Key, Value>* child = curr->getLeft();
         
         //if curr is the parent's left child, we know to change the parent's left child to curr's left child we are looking at
-        if (parent->getLeft() == curr)
+        if (parent != nullptr)
         {
-            parent->setLeft(child);
-            child->setParent(parent);
-        }
+            if (parent->getLeft() == curr)
+            {
+                parent->setLeft(child);
+            }
 
-        //otherwise it's the parent's right that is curr, so parent's right needs to be child
+            //otherwise it's the parent's right that is curr, so parent's right needs to be child
+            else
+            {
+                parent->setRight(child);
+            } 
+        }
         else
         {
-            parent->setRight(child);
-            child->setParent(parent);
+            root_ = child;
         }
+
+        child->setParent(parent);
         
     }
 
@@ -578,25 +588,31 @@ void BinarySearchTree<Key, Value>::remove(const Key& key)
         Node<Key, Value>* parent = curr->getParent();
         Node<Key, Value>* child = curr->getRight();
         
-        //if curr is the parent's left child, we know to change the parent's left child to curr's left child we are looking at
-        if (parent->getLeft() == curr)
+        if (parent != nullptr)
         {
-            parent->setLeft(child);
-            child->setParent(parent);
-        }
+            //if curr is the parent's left child, we know to change the parent's left child to curr's left child we are looking at
+            if (parent->getLeft() == curr)
+            {
+                parent->setLeft(child);
+            }
 
-        //otherwise it's the parent's right that is curr, so parent's right needs to be child
+            //otherwise it's the parent's right that is curr, so parent's right needs to be child
+            else
+            {
+                parent->setRight(child);
+            }
+        }
         else
         {
-            parent->setRight(child);
-            child->setParent(parent);
+            root_ = child;
         }
+        
+        child->setParent(parent);
         
     }
 
     //no matter what, whether hit one of above cases or had no children, delete node
-    delete curr;
-    return;
+    curr = nullptr;
 }
 
 
@@ -677,22 +693,21 @@ template<typename Key, typename Value>
 void BinarySearchTree<Key, Value>::clear()
 {
     // TODO
-    helpClear(root_);    
+    helpClear(root_);  
 }
 
 template<typename Key, typename Value>
-void BinarySearchTree<Key, Value>::helpClear(Node<Key, Value>* montez)
+void BinarySearchTree<Key, Value>::helpClear(Node<Key, Value>* curr)
 {
     // TODO
-    if (montez == nullptr)
+    if (curr == nullptr)
     {
         return;
     }
-    helpClear(montez->getLeft());
-    helpClear(montez->getRight());
-
-    delete montez;
-
+    helpClear(curr->getLeft());
+    helpClear(curr->getRight());
+    
+    curr = nullptr;
 }
 
 
@@ -773,13 +788,14 @@ bool BinarySearchTree<Key, Value>::isBalanced() const
 {
     //return whether differ by at most one
 	//use and because has to be in range of 1 and negative 1
-	return (calculateHeightIfBalanced(root_) != -1);
+    int height  = calculateHeightIfBalanced(root_);
+	return (height != -1);
     
 }
 
 template<typename Key, typename Value>
 /// Calculates the height of the tree if it is balanced. Otherwise returns -1.
-int calculateHeightIfBalanced(Node<Key, Value>* root) {
+int BinarySearchTree<Key, Value>::calculateHeightIfBalanced(Node<Key, Value>* root) const {
 	// Base case: an empty tree is always balanced and has a height of 0
 	if (root == nullptr) return 0;
 
@@ -794,6 +810,7 @@ int calculateHeightIfBalanced(Node<Key, Value>* root) {
 		return -1;
 	}
 
+    //check if is balanced so can calc height, and then do it
 	else if (abs(lefth-righth) <= 1)
 	{
 		if (lefth > righth)
@@ -805,7 +822,6 @@ int calculateHeightIfBalanced(Node<Key, Value>* root) {
 			return righth + 1;
 		}
 	}
-
 	else
 	{
 		return -1;
