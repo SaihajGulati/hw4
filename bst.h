@@ -315,7 +315,7 @@ BinarySearchTree<Key, Value>::iterator::operator==(
     const BinarySearchTree<Key, Value>::iterator& rhs) const
 {
     // TODO
-    return this->current_ == rhs.current_;
+    return current_ == rhs.current_;
 }
 
 /**
@@ -328,7 +328,7 @@ BinarySearchTree<Key, Value>::iterator::operator!=(
     const BinarySearchTree<Key, Value>::iterator& rhs) const
 {
     // TODO
-    return this->current_ != rhs.current_;
+    return current_ != rhs.current_;
 
 }
 
@@ -341,7 +341,7 @@ typename BinarySearchTree<Key, Value>::iterator&
 BinarySearchTree<Key, Value>::iterator::operator++()
 {
     // TODO
-    current_ = successor(current_);
+    this->current_ = successor(current_);
     return *this;   
 
 }
@@ -622,12 +622,18 @@ Node<Key, Value>*
 BinarySearchTree<Key, Value>::predecessor(Node<Key, Value>* current)
 {
     // TODO
-    Node<Key, Value>* curr = nullptr;
+
+		//check if current exists, otherwise return
+		if (current == nullptr)
+		{
+			return nullptr;
+		}
     //if left child exists, predecessor is the rightmost node of the left subtree
     if (current->getLeft() != nullptr)
     {
         //go left
-        curr = current->getLeft();
+
+				Node<Key, Value>* curr = current->getLeft();
 
         //go as much right as you can
         while (curr->getRight() != nullptr)
@@ -641,13 +647,18 @@ BinarySearchTree<Key, Value>::predecessor(Node<Key, Value>* current)
     //otherwise find the first node above that is a right child of a parent, and that parent is predecessor (because this node is that one's successor)
     else
     {
-        curr = current->getParent();
-        while (curr->getRight() == nullptr)
-        {
-            curr = curr->getParent();
-        }
+				//set curr to current
+        Node<Key, Value>* curr = current;
+
+				//if the parent is not null, then we can explore 
+				while (curr->getParent() != nullptr && curr->getParent()->getRight() != curr)
+				{
+						curr = curr->getParent();
+				}
+
+				//will return correct value or nullptr if curr is root
+				return curr->getParent();
     }
-    return curr;
 }
 
 template<class Key, class Value>
@@ -655,15 +666,18 @@ Node<Key, Value>*
 BinarySearchTree<Key, Value>::successor(Node<Key, Value>* current)
 {
     // TODO
-    Node<Key, Value>* curr = nullptr;
-    
-    //if left child exists, predecessor is the rightmost node of the left subtree
+
+		if (current == nullptr)
+		{
+			return nullptr;
+		}
+    //if right child exists, successor is the leftmost node of the left subtree
     if (current->getRight() != nullptr)
     {
-        //go left
-        curr = current->getRight();
+        //go right
+        Node<Key, Value>* curr = current->getRight();
 
-        //go as much right as you can
+        //go as much left as you can
         while (curr->getLeft() != nullptr)
         {
             curr = curr->getLeft();
@@ -672,16 +686,21 @@ BinarySearchTree<Key, Value>::successor(Node<Key, Value>* current)
         return curr;
     }
 
-    //otherwise find the first node above that is a right child of a parent, and that parent is predecessor (because this node is that one's successor)
+    //otherwise find the first node above that is a left child of a parent, and that parent is successor (because this node is that one's successor)
     else
     {
-        curr = current->getParent();
-        while (curr->getLeft() == nullptr)
-        {
-            curr = curr->getParent();
-        }
+				//set curr to current
+        Node<Key, Value>* curr = current;
+
+				//if the parent is not null, then we can explore 
+				while (curr->getParent() != nullptr && curr->getParent()->getLeft() != curr)
+				{
+						curr = curr->getParent();
+				}
+
+				//will return correct value or nullptr if curr is root
+				return curr->getParent();
     }
-    return curr;
 }
 
 
@@ -693,7 +712,7 @@ template<typename Key, typename Value>
 void BinarySearchTree<Key, Value>::clear()
 {
     // TODO
-    helpClear(root_);  
+    helpClear(root_); 
 }
 
 template<typename Key, typename Value>
@@ -744,18 +763,7 @@ Node<Key, Value>* BinarySearchTree<Key, Value>::internalFind(const Key& key) con
 {
     // TODO
     Node<Key, Value>* curr = root_;
-    //nullcheck
-    if (root_ == nullptr)
-    {
-        return nullptr;
-    }
-
-    //check if key is what we want, if it is skip rest of stuff
-    if (root_->getKey() == key)
-    {
-        return root_;
-    }
-
+		
     //go through and do binary search
     while (curr != nullptr)
     {
@@ -767,13 +775,10 @@ Node<Key, Value>* BinarySearchTree<Key, Value>::internalFind(const Key& key) con
         {
             curr = curr -> getRight();
         }
-        else //if get here, means are equal and so found
+        else if (curr->getKey() == key)//if get here, means are equal and so found
         {
             return curr;
         }
-
-        //if get here then curr is nullptr and didn't find
-        return nullptr;
     }
 
     //we didn't find it, so return nullptr
@@ -788,7 +793,7 @@ bool BinarySearchTree<Key, Value>::isBalanced() const
 {
     //return whether differ by at most one
 	//use and because has to be in range of 1 and negative 1
-    int height  = calculateHeightIfBalanced(root_);
+  int height  = calculateHeightIfBalanced(root_);
 	return (height != -1);
     
 }
