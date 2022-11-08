@@ -462,8 +462,7 @@ void BinarySearchTree<Key, Value>::insert(const std::pair<const Key, Value> &key
     //if root is null, need to add one to start because there is nothing in this tree
     if (root_ == nullptr)
     {
-        Node<Key, Value>* temp = new Node<Key, Value>(keyValuePair.first, keyValuePair.second, nullptr);
-        root_ = temp;
+        root_ = new Node<Key, Value>(keyValuePair.first, keyValuePair.second, nullptr);
     }
 
     else
@@ -553,7 +552,7 @@ void BinarySearchTree<Key, Value>::remove(const Key& key)
         nodeSwap(predecessor(curr), curr);
     }
 
-    //else if has left child but not right, need to move up left child and delete curr
+    //now that know are not 2 children, check if left child exists and then work with that
     if (curr->getLeft() != nullptr)
     {
         Node<Key, Value>* parent = curr->getParent();
@@ -575,7 +574,7 @@ void BinarySearchTree<Key, Value>::remove(const Key& key)
         }
         else
         {
-            root_ = child;
+          root_ = child;
         }
 
         child->setParent(parent);
@@ -611,8 +610,36 @@ void BinarySearchTree<Key, Value>::remove(const Key& key)
         
     }
 
-    //no matter what, whether hit one of above cases or had no children, delete node
-    curr = nullptr;
+		else //is the case where has no children, but still could have parent as has been swapped so need to clear out parent's left or right
+		{
+			Node<Key, Value>* parent = curr->getParent();
+			if (parent != nullptr)
+			{
+				if (parent->getLeft() == curr)
+            {
+                parent->setLeft(nullptr);
+            }
+
+            //otherwise it's the parent's right that is curr, so parent's right needs to be null since deleting
+            else
+            {
+                parent->setRight(nullptr);
+            }
+			}
+		}
+
+    //now can null out the curr node that removed
+
+		if (curr != root_)
+		{
+			delete curr;
+		}
+
+		else //is root, so need to null root so doesn't point to deleted dead pointer
+		{
+			delete curr;
+			root_ = nullptr;
+		}
 }
 
 
@@ -726,7 +753,17 @@ void BinarySearchTree<Key, Value>::helpClear(Node<Key, Value>* curr)
     helpClear(curr->getLeft());
     helpClear(curr->getRight());
     
-    curr = nullptr;
+		//if isn't root, just delete
+		if (curr != root_)
+		{
+			delete curr;
+		}
+
+		else //is root, so need to also set root to null because otherwise will point to dead pointer
+		{
+			delete curr;
+			root_ = nullptr;
+		}
 }
 
 
@@ -747,7 +784,7 @@ BinarySearchTree<Key, Value>::getSmallestNode() const
     Node<Key, Value>* curr = root_;
 
     //go left until get to end
-    while(curr != nullptr)
+    while(curr->getLeft() != nullptr)
     {
         curr = curr->getLeft();
     }
