@@ -18,7 +18,7 @@ And Run it with
 
 For part 2 in-depth tests, first
 ```
-cd hw4_tests/equalpaths-test
+cd hw4_tests/equalpaths_tests
 ```
 And then compile with 
 ```
