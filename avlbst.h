@@ -391,12 +391,26 @@ void AVLTree<Key, Value>:: remove(const Key& key)
         nodeSwap(static_cast<AVLNode<Key, Value>*>(this->predecessor(curr)), curr);
     }
 
+    AVLNode<Key, Value>* parent = curr->getParent();
+    AVLNode<Key, Value>* child = curr->getLeft();
+
+    //setup different thing
+    int8_t diff = 0;
+    if (parent != nullptr)
+    {
+        if (parent->getLeft() == curr)
+        {
+            diff = 1;            
+        }
+        else
+        {
+            diff = -1;
+        }
+    }
+
     //now that know are not 2 children, check if left child exists and then work with that
     if (curr->getLeft() != nullptr)
     {
-        AVLNode<Key, Value>* parent = curr->getParent();
-        AVLNode<Key, Value>* child = curr->getLeft();
-        
         //if curr is the parent's left child, we know to change the parent's left child to curr's left child we are looking at
         if (parent != nullptr)
         {
@@ -423,9 +437,6 @@ void AVLTree<Key, Value>:: remove(const Key& key)
     //if there is a right  child but not left child
     else if (curr->getRight() != nullptr)
     {
-        AVLNode<Key, Value>* parent = curr->getParent();
-        AVLNode<Key, Value>* child = curr->getRight();
-        
         if (parent != nullptr)
         {
             //if curr is the parent's left child, we know to change the parent's left child to curr's left child we are looking at
@@ -449,37 +460,21 @@ void AVLTree<Key, Value>:: remove(const Key& key)
         
     }
 
-		else //is the case where has no children, but still could have parent as has been swapped so need to clear out parent's left or right
-		{
-			AVLNode<Key, Value>* parent = curr->getParent();
-			if (parent != nullptr)
-			{
-				if (parent->getLeft() == curr)
-            {
-                parent->setLeft(nullptr);
-            }
-
-            //otherwise it's the parent's right that is curr, so parent's right needs to be null since deleting
-            else
-            {
-                parent->setRight(nullptr);
-            }
-			}
-		}
-
-    AVLNode<Key, Value>* p = static_cast<AVLNode<Key, Value>*>(curr->getParent());
-
-    //setup different thing
-    int8_t diff = 0;
-    if (p != nullptr)
+    else //is the case where has no children, but still could have parent as has been swapped so need to clear out parent's left or right
     {
-        if (p->getLeft() == curr)
+        AVLNode<Key, Value>* parent = curr->getParent();
+        if (parent != nullptr)
         {
-            diff = 1;            
+            if (parent->getLeft() == curr)
+        {
+            parent->setLeft(nullptr);
         }
+
+        //otherwise it's the parent's right that is curr, so parent's right needs to be null since deleting
         else
         {
-            diff = -1;
+            parent->setRight(nullptr);
+        }
         }
     }
 
@@ -495,7 +490,7 @@ void AVLTree<Key, Value>:: remove(const Key& key)
     }
 
     //patch tree
-    removeFix(p, diff);
+    removeFix(parent, diff);
 }
 
 template<class Key, class Value>
