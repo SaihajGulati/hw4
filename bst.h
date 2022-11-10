@@ -610,31 +610,36 @@ void BinarySearchTree<Key, Value>::remove(const Key& key)
         
     }
 
-    else //is the case where has no children, but still could have parent as has been swapped so need to clear out parent's left or right
-    {
-        Node<Key, Value>* parent = curr->getParent();
-        if (parent != nullptr)
-        {
-            if (parent->getLeft() == curr)
-        {
-            parent->setLeft(nullptr);
-        }
+		else //is the case where has no children, but still could have parent as has been swapped so need to clear out parent's left or right
+		{
+			Node<Key, Value>* parent = curr->getParent();
+			if (parent != nullptr)
+			{
+				if (parent->getLeft() == curr)
+            {
+                parent->setLeft(nullptr);
+            }
 
-        //otherwise it's the parent's right that is curr, so parent's right needs to be null since deleting
-        else
-        {
-            parent->setRight(nullptr);
-        }
-        }
-    }
+            //otherwise it's the parent's right that is curr, so parent's right needs to be null since deleting
+            else
+            {
+                parent->setRight(nullptr);
+            }
+			}
+		}
 
-    //delete the node want to remove
-    delete curr;
-    //if is root, need to null root so doesn't point to deleted dead pointer
-    if (curr == root_)
-    {
-        root_ = nullptr;
-    }
+    //now can null out the curr node that removed
+
+		if (curr != root_)
+		{
+			delete curr;
+		}
+
+		else //is root, so need to null root so doesn't point to deleted dead pointer
+		{
+			delete curr;
+			root_ = nullptr;
+		}
 }
 
 
@@ -748,13 +753,17 @@ void BinarySearchTree<Key, Value>::helpClear(Node<Key, Value>* curr)
     helpClear(curr->getLeft());
     helpClear(curr->getRight());
     
-	//delete the node want to remove
-    delete curr;
-    //if is root, need to null root so doesn't point to deleted dead pointer
-    if (curr == root_)
-    {
-        root_ = nullptr;
-    }
+		//if isn't root, just delete
+		if (curr != root_)
+		{
+			delete curr;
+		}
+
+		else //is root, so need to also set root to null because otherwise will point to dead pointer
+		{
+			delete curr;
+			root_ = nullptr;
+		}
 }
 
 
