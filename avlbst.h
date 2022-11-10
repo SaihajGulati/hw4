@@ -183,6 +183,7 @@ void AVLTree<Key, Value>::insert (const std::pair<const Key, Value> &new_item)
                     }
                     else if (temp->getBalance() == 0)
                     {
+                        temp->setBalance(-1);
                         insertFix(temp, baby);
                     }
                     inserted = true;
@@ -207,6 +208,7 @@ void AVLTree<Key, Value>::insert (const std::pair<const Key, Value> &new_item)
                     }
                     else if (temp->getBalance() == 0)
                     {
+                        temp->setBalance(1);
                         insertFix(temp, baby);
                     }
                     inserted = true;
