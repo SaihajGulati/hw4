@@ -392,7 +392,6 @@ void AVLTree<Key, Value>:: remove(const Key& key)
     }
 
     AVLNode<Key, Value>* parent = curr->getParent();
-    AVLNode<Key, Value>* child = curr->getLeft();
 
     //setup different thing
     int8_t diff = 0;
@@ -411,6 +410,7 @@ void AVLTree<Key, Value>:: remove(const Key& key)
     //now that know are not 2 children, check if left child exists and then work with that
     if (curr->getLeft() != nullptr)
     {
+        AVLNode<Key, Value>* child = curr->getLeft();
         //if curr is the parent's left child, we know to change the parent's left child to curr's left child we are looking at
         if (parent != nullptr)
         {
@@ -437,6 +437,7 @@ void AVLTree<Key, Value>:: remove(const Key& key)
     //if there is a right  child but not left child
     else if (curr->getRight() != nullptr)
     {
+        AVLNode<Key, Value>* child = curr->getRight();
         if (parent != nullptr)
         {
             //if curr is the parent's left child, we know to change the parent's left child to curr's left child we are looking at
@@ -611,7 +612,7 @@ void AVLTree<Key, Value>::removeFix(AVLNode<Key,Value>* n, int8_t diff)
                 rotateLeft(n);
                 n->setBalance(1);
                 c->setBalance(-1);
-                //no recusing as got to something that is perfectly balanced above so are chilling and done bc cannot be unbalanced tree
+                //no recursing as got to something that is perfectly balanced above so are chilling and done bc cannot be unbalanced tree
             }
 
             //handle case where is +1, which means a right child of a left child, and therefore zig-zag case
