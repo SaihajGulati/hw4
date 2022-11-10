@@ -5,6 +5,8 @@ For all parts, first
 cd hw4
 ```
 
+For the in-depth tests to work, make sure to add the hw4_tests folder under hw4
+
 For part 2, compile the rudimentary test file with
 ```
 make equal-paths-test
